@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zakat Calculator | زکوٰۃ کیلکولیٹر</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Noto+Nastaliq+Urdu:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e40af;
+            --secondary: #1e3a8a;
+            --surface: #ffffff;
+            --background: #f8fafc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--background);
+            font-family: 'Poppins', sans-serif;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            background: var(--surface);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: var(--primary);
+            font-size: clamp(2rem, 5vw, 3rem);
+            margin-bottom: 0.5rem;
+        }
+
+        .urdu-text {
+            font-family: 'Noto Nastaliq Urdu', serif;
+            line-height: 2;
+        }
+
+        .language-switch {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.5rem 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            z-index: 1000;
+        }
+
+        .currency-selector {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .currency-selector select {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: 2px solid var(--primary);
+            font-size: 1rem;
+            background: white;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .calculator-section {
+            background: var(--surface);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .nisab-info {
+            background: #e0f2fe;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: #f8fafc;
+            border-radius: 12px;
+        }
+
+        .input-group h3 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .input-field {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-field label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .input-field input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .input-field input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .result-section {
+            background: var(--surface);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .zakat-amount {
+            text-align: center;
+            padding: 2rem;
+            background: #f0f9ff;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .amount-display {
+            font-size: 2.5rem;
+            color: var(--primary);
+            font-weight: 600;
+            margin: 1rem 0;
+        }
+
+        .action-buttons {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0.5rem;
+            }
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            .calculator-section,
+            .result-section {
+                padding: 1rem;
+            }
+            .input-group {
+                padding: 1rem;
+            }
+            .amount-display {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="language-switch" onclick="toggleLanguage()">
+        <span class="en">اردو</span>
+        <span class="ur urdu-text" style="display: none;">English</span>
+    </button>
+
+    <div class="container">
+        <div class="header">
+            <h1 class="en">Zakat Calculator</h1>
+            <h1 class="ur urdu-text" style="display: none;">زکوٰۃ کیلکولیٹر</h1>
+            <p class="en">Calculate your Zakat easily and accurately</p>
+            <p class="ur urdu-text" style="display: none;">آسانی سے اپنی زکوٰۃ کا حساب کریں</p>
+        </div>
+
+        <div class="currency-selector">
+            <select id="currencySelect" onchange="updateCurrency()">
+                <option value="PKR">PKR - Pakistani Rupee</option>
+                <option value="USD">USD - US Dollar</option>
+                <option value="SAR">SAR - Saudi Riyal</option>
+                <option value="GBP">GBP - British Pound</option>
+                <option value="EUR">EUR - Euro</option>
+            </select>
+        </div>
+
+        <div class="main-content">
+            <div class="calculator-section">
+                <div class="nisab-info">
+                    <h3 class="en">Current Nisab Threshold</h3>
+                    <h3 class="ur urdu-text" style="display: none;">موجودہ نصاب</h3>
+                    <p id="nisabValue"></p>
+                </div>
+
+                <div class="input-group">
+                    <h3 class="en">Cash & Bank</h3>
+                    <h3 class="ur urdu-text" style="display: none;">نقد رقم اور بینک</h3>
+                    <div class="input-field">
+                        <label class="en">Cash in Hand</label>
+                        <label class="ur urdu-text" style="display: none;">نقد رقم</label>
+                        <input type="number" id="cashInHand" min="0" step="0.01" onchange="calculateZakat()">
+                    </div>
+                    <div class="input-field">
+                        <label class="en">Bank Balance</label>
+                        <label class="ur urdu-text" style="display: none;">بینک بیلنس</label>
+                        <input type="number" id="bankBalance" min="0" step="0.01" onchange="calculateZakat()">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <h3 class="en">Gold & Silver</h3>
+                    <h3 class="ur urdu-text" style="display: none;">سونا اور چاندی</h3>
+                    <div class="input-field">
+                        <label class="en">Gold (grams)</label>
+                        <label class="ur urdu-text" style="display: none;">سونا (گرام)</label>
+                        <input type="number" id="goldAmount" min="0" step="0.01" onchange="calculateZakat()">
+                    </div>
+                    <div class="input-field">
+                        <label class="en">Silver (grams)</label>
+                        <label class="ur urdu-text" style="display: none;">چاندی (گرام)</label>
+                        <input type="number" id="silverAmount" min="0" step="0.01" onchange="calculateZakat()">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <h3 class="en">Investments & Business</h3>
+                    <h3 class="ur urdu-text" style="display: none;">سرمایہ کاری اور کاروبار</h3>
+                    <div class="input-field">
+                        <label class="en">Investments</label>
+                        <label class="ur urdu-text" style="display: none;">سرمایہ کاری</label>
+                        <input type="number" id="investments" min="0" step="0.01" onchange="calculateZakat()">
+                    </div>
+                    <div class="input-field">
+                        <label class="en">Business Assets</label>
+                        <label class="ur urdu-text" style="display: none;">کاروباری اثاثے</label>
+                        <input type="number" id="businessAssets" min="0" step="0.01" onchange="calculateZakat()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="result-section">
+                <div class="zakat-amount">
+                    <h3 class="en">Total Zakat Due</h3>
+                    <h3 class="ur urdu-text" style="display: none;">کل واجب زکوٰۃ</h3>
+                    <div class="amount-display" id="zakatAmount">0</div>
+                    <p id="zakatStatus" class="en">Enter your assets to calculate Zakat</p>
+                    <p id="zakatStatusUr" class="ur urdu-text" style="display: none;">زکوٰۃ کا حساب کرنے کے لیے اپنے اثاثے درج کریں</p>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary en" onclick="calculateZakat()">Calculate Zakat</button>
+                    <button class="btn btn-primary ur urdu-text" style="display: none;" onclick="calculateZakat()">زکوٰۃ کا حساب کریں</button>
+                    
+                    <button class="btn btn-outline en" onclick="resetCalculator()">Reset</button>
+                    <button class="btn btn-outline ur urdu-text" style="display: none;" onclick="resetCalculator()">دوبارہ شروع کریں</button>
+                    
+                    <button class="btn btn-outline en" onclick="saveCalculation()">Save Calculation</button>
+                    <button class="btn btn-outline ur urdu-text" style="display: none;" onclick="saveCalculation()">حساب محفوظ کریں</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CURRENCY_RATES = {
+            PKR: { symbol: 'Rs. ', rate: 280, label: 'روپے' },
+            USD: { symbol: '$', rate: 1, label: 'ڈالر' },
+            SAR: { symbol: 'SAR ', rate: 3.75, label: 'ریال' },
+            GBP: { symbol: '£', rate: 0.79, label: 'پاؤنڈ' },
+            EUR: { symbol: '€', rate: 0.91, label: 'یورو' }
+        };
+
+        const GOLD_PRICE = 60; // USD per gram
+        const SILVER_PRICE = 0.8; // USD per gram
+        const NISAB_GOLD = 87.48; // grams
+        const NISAB_SILVER = 612.36; // grams
+
+        let currentCurrency = 'PKR';
+        let currentLanguage = 'en';
+
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'en' ? 'ur' : 'en';
+            document.querySelectorAll('.en, .ur').forEach(el => {
+                el.style.display = el.classList.contains(currentLanguage) ? 'block' : 'none';
+            });
+            updateNisabDisplay();
+            updateZakatStatus();
+        }
+
+        function updateCurrency() {
+            currentCurrency = document.getElementById('currencySelect').value;
+            updateNisabDisplay();
+            calculateZakat();
+        }
+
+        function formatCurrency(amount) {
+            const rate = CURRENCY_RATES[currentCurrency].rate;
+            const symbol = CURRENCY_RATES[currentCurrency].symbol;
+            const converted = amount * rate;
+            return `${symbol}${converted.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            })}`;
+        }
+
+        function updateNisabDisplay() {
+            const nisabValue = NISAB_GOLD * GOLD_PRICE;
+            const formattedNisab = formatCurrency(nisabValue);
+            const nisabText = currentLanguage === 'en' 
+                ? `Current Nisab: ${formattedNisab}`
+                : `موجودہ نصاب: ${formattedNisab}`;
+            document.getElementById('nisabValue').textContent = nisabText;
+        }
+
+        function calculateZakat() {
+            const rate = CURRENCY_RATES[currentCurrency].rate;
+            const values = {
+                cash: getInputValue('cashInHand') / rate,
+                bank: getInputValue('bankBalance') / rate,
+                gold: getInputValue('goldAmount') * GOLD_PRICE,
+                silver: getInputValue('silverAmount') * SILVER_PRICE,
+                investments: getInputValue('investments') / rate,
+                business: getInputValue('businessAssets') / rate
+            };
+            const totalAssets = Object.values(values).reduce((a, b) => a + b, 0);
+            const nisabThreshold = NISAB_GOLD * GOLD_PRICE;
+            const zakatAmount = totalAssets >= nisabThreshold ? totalAssets * 0.025 : 0;
+            updateDisplay(zakatAmount, totalAssets, nisabThreshold);
+        }
+
+        function getInputValue(id) {
+            return Number(document.getElementById(id).value) || 0;
+        }
+
+        function updateDisplay(zakat, total, nisab) {
+            const zakatDisplay = document.getElementById('zakatAmount');
+            const statusEn = document.getElementById('zakatStatus');
+            const statusUr = document.getElementById('zakatStatusUr');
+            
+            zakatDisplay.textContent = formatCurrency(zakat);
+
+            if (total >= nisab) {
+                statusEn.textContent = `Zakat is due on your wealth`;
+                statusUr.textContent = `آپ کے مال پر زکوٰۃ واجب ہے`;
+                statusEn.style.color = '#059669';
+                statusUr.style.color = '#059669';
+            } else {
+                statusEn.textContent = `Below Nisab threshold - no Zakat due`;
+                statusUr.textContent = `نصاب سے کم - زکوٰۃ واجب نہیں`;
+                statusEn.style.color = '#DC2626';
+                statusUr.style.color = '#DC2626';
+            }
+        }
+
+        function resetCalculator() {
+            const inputs = document.querySelectorAll('input[type="number"]');
+            inputs.forEach(input => input.value = '');
+            calculateZakat();
+        }
+
+        function saveCalculation() {
+            const date = new Date().toISOString().split('T')[0];
+            const zakatAmount = document.getElementById('zakatAmount').textContent;
+            const data = {
+                date,
+                zakatAmount,
+                currency: currentCurrency,
+                assets: {
+                    cash: getInputValue('cashInHand'),
+                    bank: getInputValue('bankBalance'),
+                    gold: getInputValue('goldAmount'),
+                    silver: getInputValue('silverAmount'),
+                    investments: getInputValue('investments'),
+                    business: getInputValue('businessAssets')
+                }
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `zakat-calculation-${date}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Initialize calculator
+        window.onload = function() {
+            updateNisabDisplay();
+            calculateZakat();
+        };
+    </script>
+</body>
+</html>
